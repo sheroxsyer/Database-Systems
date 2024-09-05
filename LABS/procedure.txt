@@ -1,0 +1,185 @@
+Delimiter $$
+create procedure display()
+begin
+select * from product 
+where P_descript like '% hammer%';
+end $$
+Delimiter ;
+
+
+
+DELIMITER $$
+
+CREATE PROCEDURE PRG_PROD()
+BEGIN
+UPDATE product
+SET P_DISCOUNT = (P_DISCOUNT*0.05)+ P_DISCOUNT
+WHERE P_ONHAND >= P_MIN*2;
+END $$
+DELIMITER ;
+
+
+DELIMITER $$
+CREATE PROCEDURE PRG_AVG_PRICE(out avg_price decimal)
+BEGIN
+SELECT AVG(P_PRICE) INTO avg_price FROM Product;
+END $$
+DELIMITER ;
+
+
+
+CREATE TABLE users (
+    user_id INT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
+    password VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL
+);
+
+
+CREATE TABLE summary (
+    id INT PRIMARY KEY,
+    total_users INT,
+    Yahoo INT,
+    Hotmail INT,
+    Gmail INT
+);
+
+
+
+INSERT INTO users (user_id, username, password, email)
+VALUES
+    (1, 'Shaheer', 'sheri123', 'sheri@yahoo.com'),
+    (2, 'Osaid', 'osii456', 'osii@gmail.com'),
+   
+
+
+INSERT INTO summary (id, total_users, Yahoo, Hotmail, Gmail)
+VALUES
+    (1, 2, 1, 0, 1);
+
+write a procedure that take id,total_user,Yahoo,Hotmail,Gmail values as an input and insert the data into the table summary
+
+
+DELIMITER $$
+CREATE PROCEDURE InsertSummaryData(
+    IN summary_id INT,
+    IN total_users INT,
+    IN yahoo_count INT,
+    IN hotmail_count INT,
+    IN gmail_count INT
+)
+BEGIN
+    INSERT INTO summary (id, total_users, Yahoo, Hotmail, Gmail)
+    VALUES (summary_id, total_users, yahoo_count, hotmail_count, gmail_count);
+END $$
+DELIMITER ;
+
+
+CALL InsertSummaryData(1, 10, 3, 4, 3);
+
+
+DELETE FROM summary WHERE id = 1;
+
+
+CALL InsertSummaryData(1, 10, 3, 4, 3);
+__________________________________________________________________________________________________________________________
+write a procedure that take user_id,username,password,email values as an input and insert the data into the table users
+
+
+DELIMITER $$
+CREATE PROCEDURE InsertUserData(
+    IN user_id INT,
+    IN username VARCHAR(50),
+    IN user_password VARCHAR(100),
+    IN user_email VARCHAR(100)
+)
+BEGIN
+    INSERT INTO users (user_id, username, password, email)
+    VALUES (user_id, username, user_password, user_email);
+END $$
+DELIMITER ;
+
+
+
+CALL InsertUserData(3, 'Abubakar', '123', 'abu@hotmail.com');
+
+write a procedure that output the average value of yahoo
+
+DELIMITER $$
+CREATE PROCEDURE CalculateYahooAverage()
+BEGIN
+    DECLARE avgYahoo INT;
+    
+    SELECT AVG(Yahoo) INTO avgYahoo
+    FROM summary;
+
+    SELECT avgYahoo AS AverageYahooUsers;
+END $$
+DELIMITER ;
+
+
+CALL CalculateYahooAverage();
+
+write a procedure that output the min value of gmail
+
+
+DELIMITER $$
+CREATE PROCEDURE CalculateMinGmailCount()
+BEGIN
+    DECLARE minGmail INT;
+
+    SELECT MIN(Gmail) INTO minGmail
+    FROM summary;
+
+    SELECT minGmail AS MinGmailUsers;
+END $$
+DELIMITER ;
+
+
+CALL CalculateMinGmailCount();
+
+______________________________________
+write a procedure that output the max value of hotmail
+
+
+DELIMITER //
+CREATE PROCEDURE CalculateMaxHotmailCount()
+BEGIN
+    DECLARE maxHotmail INT;
+
+    SELECT MAX(Hotmail) INTO maxHotmail
+    FROM summary;
+
+    SELECT maxHotmail AS MaxHotmailUsers;
+END //
+DELIMITER ;
+
+
+CALL CalculateMaxHotmailCount();
+
+_______________________________________________
+
+Write a procedure that increment the total user by 1 when yahoo value is less then equal to hotmail
+
+
+DELIMITER $$
+CREATE PROCEDURE IncrementTotalUsersWhenYahooLeHotmail()
+BEGIN
+    DECLARE yahooCount INT;
+    DECLARE hotmailCount INT;
+
+    SELECT Yahoo, Hotmail INTO yahooCount, hotmailCount
+    FROM summary
+    WHERE id = 1; -- Replace with the appropriate summary ID
+
+    IF yahooCount <= hotmailCount THEN
+        UPDATE summary
+        SET total_users = total_users + 1
+        WHERE id = 1; -- Replace with the appropriate summary ID
+    END IF;
+END $$
+DELIMITER ;
+
+
+CALL IncrementTotalUsersWhenYahooLeHotmail();
+
